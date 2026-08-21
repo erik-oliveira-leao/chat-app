@@ -41,11 +41,14 @@ wss.on('connection', (ws) => {
     console.log('Novo cliente conectado');
 
     ws.on('message', (message) => {
-        console.log('Mensagem recebida:', message);
-        // Envie a mensagem para todos os clientes conectados
+        // Converte o Buffer recebido em string legível
+        const textMessage = message.toString();
+        console.log('Mensagem recebida:', textMessage);
+        
+        // Envia a mensagem de texto para todos os clientes conectados
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
-                client.send(message);
+                client.send(textMessage);
             }
         });
     });
@@ -53,20 +56,14 @@ wss.on('connection', (ws) => {
     ws.on('close', () => {
         console.log('Cliente desconectado');
     });
-    ws.onopen = () => {
-        console.log('Conexão WebSocket estabelecida');
-    };
-    
-    ws.onerror = (error) => {
+
+    ws.on('error', (error) => {
         console.error('Erro no WebSocket:', error);
-    };
-    
-    ws.onclose = () => {
-        console.log('Conexão WebSocket fechada');
-    };
-    
+    });
 });
 
-server.listen(8081, () => {
-    console.log('Chat disponível em http://localhost:8081');
+// Define a porta e inicia o servidor HTTP e WebSocket
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
