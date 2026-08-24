@@ -1,4 +1,3 @@
-// server.js
 const http = require('http');
 const fs = require('fs');
 const WebSocket = require('ws');
@@ -41,11 +40,14 @@ wss.on('connection', (ws) => {
     console.log('Novo cliente conectado');
 
     ws.on('message', (message) => {
-        console.log('Mensagem recebida:', message);
-        // Envie a mensagem para todos os clientes conectados
+        // Converte o Buffer recebido em string legível
+        const textMessage = message.toString();
+        console.log('Mensagem recebida:', textMessage);
+        
+        // Envia a mensagem de texto para todos os clientes conectados
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
-                client.send(message);
+                client.send(textMessage);
             }
         });
     });
@@ -53,20 +55,17 @@ wss.on('connection', (ws) => {
     ws.on('close', () => {
         console.log('Cliente desconectado');
     });
-    ws.onopen = () => {
-        console.log('Conexão WebSocket estabelecida');
-    };
-    
-    ws.onerror = (error) => {
+
+    ws.on('error', (error) => {
         console.error('Erro no WebSocket:', error);
-    };
-    
-    ws.onclose = () => {
-        console.log('Conexão WebSocket fechada');
-    };
-    
+    });
 });
 
-server.listen(8081, () => {
-    console.log('Chat disponível em http://localhost:8081');
+// Altere o final do seu server.js para isto:
+
+// Usa a porta fornecida pela plataforma ou a 3000 como padrão local
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
